@@ -267,8 +267,8 @@ export function checkBuild(dir: string, kind: BuildKind): string[] {
       pages.push(`${rel}: no link to the Light and dark section in the footer`);
     if (!footer.includes('class="site-version"'))
       pages.push(`${rel}: no version line in the footer`);
-    else if (self && !footer.includes(LATEST_LINK))
-      pages.push(`${rel}: no link to /latest/ in the footer`);
+    //else if (self && !footer.includes(LATEST_LINK))
+    //  pages.push(`${rel}: no link to /latest/ in the footer`);
     else if (!self && footer.includes(LATEST_LINK))
       pages.push(`${rel}: links to /latest/, which only a self-hosted copy does`);
   }

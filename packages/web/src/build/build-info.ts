@@ -66,9 +66,8 @@ export function footerVersion({
   selfHost: boolean;
   date: string | undefined;
 }): string {
-  if (!selfHost) return `<p class="site-version">pbiplint ${version}</p>`;
-  const link = external(`${SITE}/latest/#${version}`, "Check for a newer version");
-  return `<p class="site-version">pbiplint ${version}${date ? `, from ${date}` : ""}. ${link}</p>`;
+  if (!selfHost) return `<p class="site-version">Data Tutor · Power BI Checker v${version}</p>`;
+  return `<p class="site-version">Data Tutor · Power BI Checker v${version}${date ? ` (${date})` : ""}</p>`;
 }
 
 /** Writes the version line into every page's footer, in the dev server and the build alike. */

@@ -530,13 +530,13 @@ export function contentPage(markdown: string, path: string, source: string): str
 export function latestPage(version: string): string {
   const v = escapeHtml(version);
   return page({
-    title: "Is your pbiplint up to date?",
-    description: "Compare your copy of pbiplint with the latest version.",
+    title: "Είναι ενημερωμένο το εργαλείο;",
+    description: "Σύγκριση έκδοσης του Data Tutor Power BI Checker.",
     path: "/latest/",
     main: `<article class="prose">
-<h1>Is your pbiplint up to date?</h1>
-<p id="latest-answer" data-version="${v}" aria-live="polite">The latest pbiplint is ${v}.</p>
-<p>${external("https://github.com/pbiplint/pbiplint/releases", "The releases page")} lists every version and what changed in it. To update a copy your firm hosts, follow <a href="/self-host/#update">the update steps</a>.</p>
+<h1>Έλεγχος έκδοσης</h1>
+<p id="latest-answer" data-version="${v}" aria-live="polite">Η τρέχουσα έκδοση είναι ${v}.</p>
+<p>${external("https://github.com/alexvks22/pbiplint/releases", "Η σελίδα εκδόσεων (Releases)")} περιλαμβάνει όλες τις διαθέσιμες εκδόσεις.</p>
 </article>`,
     scripts: ["/src/latest.ts"],
   });
