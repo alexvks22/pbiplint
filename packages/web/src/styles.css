@@ -1,68 +1,60 @@
 @import "@fontsource-variable/inter";
 
 :root {
-  --brand-blue: #2d7dd2;
-  --brand-blue-soft: #4f9de8;
-  --brand-teal: #00a9a5;
-  --brand-teal-soft: #3fc7c3;
+  --brand-blue: #c84b53;
+  --brand-blue-soft: #e06c73;
+  --brand-teal: #f7ddd3;
+  --brand-teal-soft: #f2c2b0;
   /* The Power Query layer's tag, told from the model, report, and project tags. */
   --layer-powerquery: #b392f0;
-  --canvas: #0a0e1a;
-  --surface-1: #11172a;
-  --surface-2: #18203a;
-  --surface-3: #1f2a4a;
-  --surface-inset: #070a14;
-  --fg-1: #e6edf6;
-  --fg-2: #a9b4c7;
-  --fg-3: #6b7894;
-  --line-1: rgba(230, 237, 246, 0.08);
-  --line-2: rgba(230, 237, 246, 0.14);
-  --line-3: rgba(230, 237, 246, 0.22);
+  --canvas: #120b0c;
+  --surface-1: #1c1113;
+  --surface-2: #26171a;
+  --surface-3: #331e22;
+  --surface-inset: #0d0708;
+  --fg-1: #f7f2f2;
+  --fg-2: #cbbaba;
+  --fg-3: #8c7879;
+  --line-1: rgba(247, 221, 211, 0.09);
+  --line-2: rgba(247, 221, 211, 0.16);
+  --line-3: rgba(247, 221, 211, 0.25);
   --warning: #f0b429;
   --danger: #e5484d;
-  /* Only the bar beside a rule page's fixed example. Radix Colors' grass 9, the same step as
-     --danger's red 9; their green 9 sits too close to the brand teal
-     (https://www.radix-ui.com/colors). */
   --success: #46a758;
-  /* A severity badge's fill and text, and the teal tints behind the drop zone and the report at a
-     glance. */
   --badge-error-bg: rgba(229, 72, 77, 0.18);
   --badge-error-fg: #ff8a8e;
   --badge-warning-bg: rgba(240, 180, 41, 0.18);
   --badge-warning-fg: #ffd166;
-  --badge-info-bg: rgba(45, 125, 210, 0.2);
-  --badge-info-fg: #8ec3ff;
-  --teal-tint: rgba(0, 169, 165, 0.08);
-  --teal-tint-faint: rgba(0, 169, 165, 0.06);
-  --teal-edge: rgba(0, 169, 165, 0.35);
-  --font-sans: "Inter Variable", "Helvetica Neue", Arial, sans-serif;
+  --badge-info-bg: rgba(155, 43, 50, 0.28);
+  --badge-info-fg: #f7ddd3;
+  --teal-tint: rgba(247, 221, 211, 0.08);
+  --teal-tint-faint: rgba(247, 221, 211, 0.05);
+  --teal-edge: rgba(247, 221, 211, 0.35);
+  --font-sans: "Inter Variable", "Inter", "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --radius: 10px;
   --container: 1080px;
   color-scheme: dark;
 }
-/* The light theme, for a reader whose system is set to light; dark stays the default. CSS only,
-   so nothing is stored and no script runs. The brand's teal and blue are too pale for text on a
-   light page, so text and marks use darker steps of the same hues; a "soft" token is the readable
-   step, which on a light page is the darker one. The favicon keeps its dark tile. */
+
 @media (prefers-color-scheme: light) {
   :root {
-    --brand-blue: #1f63ad;
-    --brand-blue-soft: #1a5596;
-    --brand-teal: #00807c;
-    --brand-teal-soft: #006e6b;
+    --brand-blue: #9b2b32;
+    --brand-blue-soft: #7d2127;
+    --brand-teal: #9b2b32;
+    --brand-teal-soft: #7d2127;
     --layer-powerquery: #6e3fc0;
-    --canvas: #f7f9fc;
+    --canvas: #fdf8f6;
     --surface-1: #ffffff;
-    --surface-2: #eaeef5;
-    --surface-3: #dde3ee;
-    --surface-inset: #eef1f6;
-    --fg-1: #0a0e1a;
-    --fg-2: #45526b;
-    --fg-3: #6a7790;
-    --line-1: rgba(10, 14, 26, 0.1);
-    --line-2: rgba(10, 14, 26, 0.16);
-    --line-3: rgba(10, 14, 26, 0.26);
+    --surface-2: #f7ddd3;
+    --surface-3: #efd0c4;
+    --surface-inset: #f9ece7;
+    --fg-1: #1f1213;
+    --fg-2: #573d3f;
+    --fg-3: #85686a;
+    --line-1: rgba(155, 43, 50, 0.1);
+    --line-2: rgba(155, 43, 50, 0.18);
+    --line-3: rgba(155, 43, 50, 0.28);
     --warning: #8a5b00;
     --danger: #c7282e;
     --success: #2f7d3e;
@@ -70,11 +62,11 @@
     --badge-error-fg: #a51d23;
     --badge-warning-bg: rgba(176, 120, 0, 0.16);
     --badge-warning-fg: #7a4f00;
-    --badge-info-bg: rgba(31, 99, 173, 0.12);
-    --badge-info-fg: #1a5596;
-    --teal-tint: rgba(0, 128, 124, 0.08);
-    --teal-tint-faint: rgba(0, 128, 124, 0.06);
-    --teal-edge: rgba(0, 128, 124, 0.35);
+    --badge-info-bg: rgba(155, 43, 50, 0.12);
+    --badge-info-fg: #9b2b32;
+    --teal-tint: rgba(155, 43, 50, 0.07);
+    --teal-tint-faint: rgba(155, 43, 50, 0.04);
+    --teal-edge: rgba(155, 43, 50, 0.35);
     color-scheme: light;
   }
 }
