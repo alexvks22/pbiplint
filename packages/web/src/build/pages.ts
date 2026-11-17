@@ -1,7 +1,7 @@
 import { Marked, Renderer, type Tokens } from "marked";
 import { FILTER_LAYERS, LAYER_LABEL, RULE_LAYERS, boxLabel, type RuleLayer } from "../layers.js";
 
-export const SITE = "https://pbiplint.com";
+export const SITE = "https://datatutor-powerbi-checker.onrender.com";
 
 export const NAV = [
   { href: "/", label: "Έλεγχος" },
