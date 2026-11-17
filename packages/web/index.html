@@ -3,13 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>pbiplint: best-practice linter for Power BI projects</title>
+    <title>Data Tutor · PBIP Linter: best-practice linter for Power BI projects</title>
     <meta
       name="description"
       content="Paste TMDL or drop a PBIP folder and get ranked best-practice findings for the semantic model and the report, with fix guidance. Runs in your browser. Nothing is uploaded."
     />
-    <link rel="canonical" href="https://pbiplint.com/" />
-    <meta property="og:title" content="pbiplint" />
+    <meta property="og:title" content="Data Tutor · PBIP Linter" />
     <meta
       property="og:description"
       content="Best-practice linter for Power BI projects. Runs in your browser. Nothing is uploaded."
@@ -21,7 +20,7 @@
     <header class="site-header">
       <div class="container">
         <a class="brand" href="/"
-          ><img src="/favicon.svg" alt="" width="28" height="28" /> pbiplint</a
+          ><img src="/favicon.svg" alt="" width="28" height="28" /> Data Tutor · PBIP Linter</a
         >
         <!-- The row on a wide screen; below 680 pixels the stylesheet shows the Menu button instead.
              The two lists are the same, and NAV in src/build/pages.ts is the one they follow. -->
@@ -29,7 +28,7 @@
           <a href="/" aria-current="page">Lint</a><a href="/rules/">Rules</a><a href="/cli/">CLI</a
           ><a href="/pipelines/">Pipelines</a><a href="/privacy/">Privacy</a
           ><a href="/about/">About</a
-          ><a href="https://github.com/pbiplint/pbiplint" target="_blank" rel="noopener noreferrer"
+          ><a href="[YOUR_GITHUB_REPO_URL]" target="_blank" rel="noopener noreferrer"
             >GitHub<span class="visually-hidden"> (opens in a new tab)</span></a
           >
         </nav>
@@ -42,7 +41,7 @@
             ><a href="/cli/">CLI</a><a href="/pipelines/">Pipelines</a
             ><a href="/privacy/">Privacy</a><a href="/about/">About</a
             ><a
-              href="https://github.com/pbiplint/pbiplint"
+              href="[YOUR_GITHUB_REPO_URL]"
               target="_blank"
               rel="noopener noreferrer"
               >GitHub<span class="visually-hidden"> (opens in a new tab)</span></a
@@ -56,7 +55,7 @@
         <h1>Lint your Power BI project in the browser</h1>
         <p class="lede">
           Paste TMDL, or drop a PBIP folder, a <code>.SemanticModel</code> folder, or a
-          <code>.Report</code> folder. pbiplint checks the semantic model against the Microsoft
+          <code>.Report</code> folder. The linter checks the semantic model against the Microsoft
           best-practice rules and the report against PBI Inspector's rules and its own, ranks what
           it finds, and tells you how to fix each one. Nothing is uploaded: the analysis runs in
           this tab.
@@ -88,7 +87,7 @@
             <button id="choose-folder" type="button" class="secondary">Choose a folder</button>
             <p id="picker-note" class="hint picker-note" hidden>
               Chrome and Edge ask first whether this page may view the folder; that wording is the
-              browser's own. pbiplint only reads the files, in this tab: nothing is uploaded and
+              browser's own. This tool only reads the files, in this tab: nothing is uploaded and
               nothing is saved. Dragging the folder onto the page skips the question.
             </p>
             <input id="folder-input" type="file" webkitdirectory multiple hidden />
@@ -119,20 +118,26 @@
       <div class="container">
         <p>
           Nothing you lint leaves your browser:
-          <a href="/privacy/">the pbiplint Privacy Promise</a>.
+          <a href="/privacy/">the Privacy Promise</a>.
         </p>
         <p>
           Light or dark follows your device's setting:
           <a href="/about/#light-and-dark">how to change it</a>.
         </p>
         <p>
-          Free software under the AGPL-3.0-or-later license, from the makers of
+          Hosted by <strong>Data Tutor</strong>. Powered by the open-source
           <a
-            href="https://www.youtube.com/@TheDataPractitioner"
+            href="https://github.com/pbiplint/pbiplint"
             target="_blank"
             rel="noopener noreferrer"
-            >The Data Practitioner<span class="visually-hidden"> (opens in a new tab)</span></a
-          >. pbiplint and its logo are trademarks of McKinley Consulting.
+            >pbiplint<span class="visually-hidden"> (opens in a new tab)</span></a
+          >
+          engine under the AGPL-3.0-or-later license (<a
+            href="[YOUR_GITHUB_REPO_URL]"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Source Code<span class="visually-hidden"> (opens in a new tab)</span></a
+          >).
         </p>
         <!-- pbiplint-version -->
       </div>
