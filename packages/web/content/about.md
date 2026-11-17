@@ -1,53 +1,39 @@
 ---
-title: About pbiplint
-description: What pbiplint is, what it checks, who makes it, and what it does not do.
+title: Σχετικά με το Data Tutor · Power BI Checker
+description: Τι είναι το Power BI Checker, τι ελέγχει στο μοντέλο και την αναφορά σας, και πώς προστατεύει τα δεδομένα σας.
 ---
 
-# About pbiplint
+# Σχετικά με το Data Tutor · Power BI Checker
 
-pbiplint is a free, open-source best-practice linter for Power BI projects. Paste TMDL or drop a PBIP folder on the [home page](/), or run `npx pbiplint <path>` on your own machine with [the pbiplint CLI](/cli/), and get a ranked list of findings with a page for every rule that says what it checks, why it matters, and how to fix it.
+Το **Data Tutor · Power BI Checker** είναι ένα δωρεάν εκπαιδευτικό εργαλείο ελέγχου βέλτιστων πρακτικών για έργα Power BI (`.pbip`). Σύρετε τον φάκελο του έργου σας στην [αρχική σελίδα](/) ή επικολλήστε τον κώδικα TMDL του μοντέλου σας και λάβετε άμεσα μια ιεραρχημένη λίστα ευρημάτων με αναλυτικές οδηγίες διόρθωσης για κάθε κανόνα.
 
-## What it checks
+## Τι ελέγχει
 
-The site and the command-line tool read both parts of a Power BI project: the semantic model, saved as TMDL, and the report, saved in the PBIR format. Drop a PBIP folder on the site, or point `npx pbiplint` at one, and both are checked together, as long as the report reads the model beside it; a report bound to a published model is checked on its own, and the results say why. A `.SemanticModel` or `.Report` folder given alone is checked by itself, so a report without its model is valid input too. When both parts are checked together, the model is also judged by what the report uses: a field the report names that the model does not have is an error, and a column or measure the report never reaches is listed. Inside the model they also read Power Query: the M behind each table and shared expression, parsed with Microsoft's Power Query parser, so a finding in a query names the query and the step as Power Query's editor shows them.
+Το εργαλείο διαβάζει και τα δύο μέρη ενός Power BI Project:
+- **Το μοντέλο δεδομένων (Semantic Model - TMDL):** Ελέγχει τους πίνακες, τις στήλες, τις σχέσεις, τα DAX measures και τον κώδικα Power Query (M).
+- **Την αναφορά (Report - PBIR):** Ελέγχει τις σελίδες, τα γραφήματα (visuals), τα φίλτρα και τη μορφοποίηση.
 
-The model rules include every rule from the Microsoft Best Practice Analyzer ruleset, each rebuilt in pbiplint and checked against Tabular Editor's findings on the same model, with twelve documented differences, and rules of pbiplint's own for a year or a date fixed in DAX, for DAX user-defined functions, for translations, and for decimal columns' format strings, four of them taking their test from Tabular Editor 3's built-in rules or Tabular Editor's community rule files and checked against Tabular Editor. Of the Microsoft rules, the five that need statistics only a live model has are listed but not run, and a column whose TMDL names no type, as Power BI Desktop saves most calculated columns, is left out of the thirteen that test a column's type, where Tabular Editor reads the type from the column's DAX. The report rules are rules ported from PBI Inspector's base rules, by Nat Van Gulck, plus rules of pbiplint's own. The Power Query rules, 16 of them, are Microsoft's `MINIMIZE_POWER_QUERY_TRANSFORMATIONS` and 15 of pbiplint's own, which read the M and the file's Power Query options. 122 rules in all, 40 of them built into pbiplint. The [rules index](/rules/) has the full list, and [its Power Query view](/rules/?layer=powerquery) shows those alone.
+Όταν ανεβάζετε ολόκληρο τον φάκελο του project, ελέγχει και τη σύνδεση μεταξύ τους (για παράδειγμα, εντοπίζει στήλες ή measures που δεν χρησιμοποιούνται πουθενά στην αναφορά). Συνολικά εφαρμόζει **πάνω από 120 κανόνες** βασισμένους στα επίσημα πρότυπα της Microsoft (Best Practice Analyzer) και του PBI Inspector. Μπορείτε να δείτε όλη τη λίστα στη σελίδα [Κανόνες](/rules/).
 
-## Who makes it
+## Ποιος το δημιούργησε & Άδεια Χρήσης
 
-pbiplint is made by McKinley Consulting, the makers of [The Data Practitioner](https://www.youtube.com/@TheDataPractitioner). It is free software under the GNU Affero General Public License, version 3 or later, and the source is on [GitHub](https://github.com/pbiplint/pbiplint). There is no paid tier, and no plan to charge for rules.
+Η πλατφόρμα φιλοξενείται και προσαρμόστηκε εκπαιδευτικά από την **Data Tutor**. Ο πυρήνας ανάλυσης βασίζεται στο open-source λογισμικό **pbiplint** (δημιουργία της McKinley Consulting), το οποίο διατίθεται ελεύθερα υπό την άδεια **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 
-<h2 id="verify">Privacy</h2>
+<h2 id="verify">Ασφάλεια & Ιδιωτικότητα</h2>
 
-The analysis runs in your browser, and nothing behind this site receives what you lint. [The pbiplint Privacy Promise](/privacy/) says what that covers on the site, on the command line, and in your pipelines, and how to check it for yourself. To run a verified copy of the site inside your own network instead, see [Host pbiplint yourself](/self-host/).
+Όλος ο έλεγχος εκτελείται **αποκλειστικά στον browser του υπολογιστή σας**. Κανένα αρχείο, κανένα όνομα στήλης και κανένα δεδομένο δεν αποστέλλεται στο internet ή σε κάποιον server. Διαβάστε περισσότερα στη σελίδα [Πολιτική Ασφαλείας](/privacy/).
 
-<h2 id="light-and-dark">Light and dark</h2>
+<h2 id="light-and-dark">Φωτεινό και σκοτεινό θέμα (Light & Dark)</h2>
 
-This site has a light theme and a dark one, and shows the one your device is set to. To switch, change the setting on your device:
+Η σελίδα διαθέτει φωτεινό και σκοτεινό θέμα και προσαρμόζεται αυτόματα ανάλογα με τις ρυθμίσεις της συσκευής σας:
 
-- **Mac:** System Settings > Appearance, then Light, Dark, or Auto ([Apple's steps](https://support.apple.com/guide/mac-help/use-a-light-or-dark-appearance-mchl52e1c2d2/mac)).
-- **Windows:** Settings > Personalization > Colors, then under "Choose your mode", Light or Dark ([Microsoft's steps](https://support.microsoft.com/windows/change-colors-in-windows-d26ef4d6-819a-581c-1581-493cfcc005fe)).
-- **iPhone and iPad:** Settings > Appearance, then Light or Dark; in iOS 26 and earlier, the setting is under Display & Brightness ([Apple's steps](https://support.apple.com/108350)).
-- **Android:** Settings > Display, then turn Dark theme on or off ([Google's steps](https://support.google.com/android/answer/9730472)).
+- **Windows:** Ρυθμίσεις > Εξατομίκευση > Χρώματα > Επιλογή λειτουργίας (Φωτεινό ή Σκοτεινό).
+- **Mac:** Ρυθμίσεις συστήματος > Εμφάνιση > Φωτεινό, Σκοτεινό ή Αυτόματο.
+- **iPhone & iPad:** Ρυθμίσεις > Οθόνη & Φωτεινότητα (ή Εμφάνιση).
+- **Android:** Ρυθμίσεις > Οθόνη > Σκούρο θέμα.
 
-These browsers have a setting of their own that overrides your device's, so check it if the site shows the theme you did not expect:
+Αν ο browser σας (Chrome, Edge, Firefox) έχει δική του ρύθμιση εμφάνισης, υπερισχύει της ρύθμισης του υπολογιστή. Η ιστοσελίδα δεν χρησιμοποιεί κουμπί εναλλαγής θέματος γιατί δεν αποθηκεύει απολύτως τίποτα (ούτε cookies, ούτε τοπικές ρυθμίσεις) στον browser σας.
 
-- **Chrome on a computer:** at the bottom right of a New Tab page, select Customize Chrome, then under Appearance, Light, Dark, or Device ([Google's steps](https://support.google.com/chrome/answer/9275525?co=GENIE.Platform%3DDesktop)).
-- **Edge on a computer:** Settings and more > Settings > Appearance, then under Overall appearance, Light, Dark, or System ([Microsoft's steps](https://support.microsoft.com/en-us/help/4533310)).
-- **Firefox on a computer:** Settings > General, then under Website appearance, Light, Dark, or System ([Mozilla's steps](https://support.mozilla.org/kb/change-website-appearance-settings-firefox)).
+## Τι δεν κάνει
 
-Safari has no setting of its own: it follows your Mac, iPhone, or iPad. A dark-mode browser extension can make every site dark, this one included, whatever the settings above say.
-
-The site has no button to switch themes. A button would have to store your choice in your browser to remember it from one page to the next, and [the Promise](/privacy/#the-promise) says "The site stores nothing in your browser."
-
-## Known limits in the browser
-
-pbiplint reads one semantic model and one report per run. A folder that holds two semantic models saved as TMDL, or two reports, is refused with their names; drop the one you want, or a folder that holds one of each. A folder that holds projects in folders below it is linted as the one project there, with a notice naming it, or refused with a list of them when it holds more than one; drop one at a time.
-
-The "Choose a folder" button uses the browser's folder picker. In Chrome and Edge that picker does not list files whose names begin or end with a space, so a table file named that way is skipped without a message and its findings are missing. Dragging the folder onto the page, or running the command line, reads every file. The rule that flags such names, `OBJECTS_SHOULD_NOT_START_OR_END_WITH_A_SPACE`, says the same on its page.
-
-In Firefox and Safari the button opens the browser's folder chooser instead, which cannot tell the page when the operating system will not let the browser open a folder inside the one you choose, such as one without read permission. Safari leaves that inner folder out without a message, so its findings are missing. In Firefox nothing is linted, and the page says it found no model or report and suggests dragging the folder onto the page instead. A drag in Chrome, Edge, or Firefox, choosing the folder in Chrome or Edge, or pointing the command line at it reads the rest and names the inner folder in a notice; a drag in Safari leaves the inner folder out in the same way.
-
-## What it does not do
-
-pbiplint does not document models, apply fixes, or analyze query performance. For documentation there is PBIP Documenter; for query plans there is DAX Studio. The model rules pbiplint ports are the Best Practice Analyzer rules, so apart from the five rules that need a live model and the deviations each rule's page documents, a model that is clean here is clean there too.
+Το εργαλείο δεν τροποποιεί αυτόματα τα αρχεία σας (μόνο τα διαβάζει για να σας προτείνει βελτιώσεις) και δεν αναλύει την ταχύτητα εκτέλεσης ερωτημάτων (για query plans χρησιμοποιήστε το DAX Studio).

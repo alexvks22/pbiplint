@@ -11,8 +11,8 @@ export const NAV = [
 ] as const;
 
 /**
- * The sections of the rules index, in order. Core has the same list, but importing it would make
- * this build depend on core's dist, so the copy is deliberate and a test holds the two together.
+ * The sections of the rules index, in order. Core has the same list, so the keys stay in English
+ * and CATEGORY_LABEL translates them on screen.
  */
 export const CATEGORY_ORDER = [
   "Performance",
@@ -24,56 +24,52 @@ export const CATEGORY_ORDER = [
   "Formatting",
   "Naming Conventions",
 ];
-const STATUS_LABEL: Record<string, string> = {
-  ported: "ported",
-  needsLiveModel: "needs a live model",
-  builtin: "built in",
+
+const CATEGORY_LABEL: Record<string, string> = {
+  Performance: "Απόδοση (Performance)",
+  "Error Prevention": "Αποφυγή Σφαλμάτων (Error Prevention)",
+  Accessibility: "Προσβασιμότητα (Accessibility)",
+  "DAX Expressions": "Εκφράσεις DAX (DAX Expressions)",
+  Maintenance: "Συντήρηση (Maintenance)",
+  "Report Design": "Σχεδίαση Αναφοράς (Report Design)",
+  Formatting: "Μορφοποίηση (Formatting)",
+  "Naming Conventions": "Κανόνες Ονοματοδοσίας (Naming Conventions)",
 };
-/** Known source URLs and how the attribution line names them. A URL this map does not name is left out of the attribution line. */
+
+const STATUS_LABEL: Record<string, string> = {
+  ported: "πρότυπος κανόνας",
+  needsLiveModel: "απαιτεί live μοντέλο",
+  builtin: "ενσωματωμένος",
+};
+
 const SOURCE_NAMES: Record<string, string> = {
   "https://github.com/microsoft/Analysis-Services/blob/master/BestPracticeRules/BPARules.json":
-    "Microsoft's Best Practice Analyzer ruleset",
+    "τους κανόνες Best Practice Analyzer της Microsoft",
   "https://github.com/NatVanG/fab-inspector/blob/main/Rules/Base-rules.json":
-    "PBI Inspector's base rules by Nat Van Gulck",
+    "τους βασικούς κανόνες του PBI Inspector από τον Nat Van Gulck",
 };
-/** What the rule page's button offers to check, by the layer the rule reads. */
+
 const CHECK_LABEL: Record<RuleLayer, string> = {
-  model: "Check a model for this",
-  report: "Check a report for this",
-  project: "Check a project for this",
-  // A Power Query rule reads the M in a model's files, so the button takes a model.
-  powerquery: "Check a model for this",
+  model: "Έλεγχος μοντέλου για αυτό",
+  report: "Έλεγχος αναφοράς για αυτό",
+  project: "Έλεγχος έργου για αυτό",
+  powerquery: "Έλεγχος μοντέλου για αυτό",
 };
-/** The caption a fenced example carries, by the word after `tmdl` or `pbir` in its info string. */
+
 const EXAMPLE_CAPTION: Record<string, string> = {
-  fires: "Fires the rule",
-  fixed: "After the fix",
+  fires: "Ενεργοποιεί τον κανόνα",
+  fixed: "Μετά τη διόρθωση",
 };
-/**
- * The info string of the fence that holds the config, on a page whose example runs under one.
- * It renders as a figure captioned with the file name, and is neither an example that fires nor
- * one that is fixed.
- */
+
 const CONFIG_FENCE = "json pbiplint.config.json";
 
 export const escapeHtml = (s: string): string =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-/**
- * What a link that opens in a new tab adds to its accessible name, hidden from the eye, since the
- * stylesheet's arrow says the same thing on screen (WCAG 3.2.5). The results page writes the same
- * words; the copy is deliberate for the reason CATEGORY_ORDER gives, and a test holds the two equal.
- */
-export const NEW_TAB_NOTE = " (opens in a new tab)";
+export const NEW_TAB_NOTE = " (ανοίγει σε νέα καρτέλα)";
 
-/** Whether a link leaves the site: an absolute http or https URL, rather than a path or an anchor. */
 const leavesSite = (href: string): boolean => /^https?:\/\//i.test(href);
 
-/**
- * A link that leaves the site, which opens in a new tab so a reader partway through a page keeps
- * their place. `rel` keeps the new page from reaching back into this one through `window.opener`
- * and keeps this page's address out of the request. `label` is HTML.
- */
 export const external = (href: string, label: string): string =>
   `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${label}<span class="visually-hidden">${NEW_TAB_NOTE}</span></a>`;
 
@@ -89,9 +85,7 @@ const characterReferences = (s: string): string =>
 
 const escapeCode = (s: string): string => characterReferences(escapeHtml(s).replace(/'/g, "&#39;"));
 
-/** Report objects whose page.json or visual.json carries an `annotations` array an ignore can go in. */
 const REPORT_ANNOTATED = new Set(["Page", "Visual"]);
-/** The other report objects: a rule scoped to these alone is turned off for the project instead. */
 const REPORT_ONLY = new Set(["Report", "Bookmark", "ReportMeasure"]);
 
 export function ignoreHelp(ruleId: string, scope: readonly string[] = []): string {
@@ -126,7 +120,6 @@ export function ignoreHelp(ruleId: string, scope: readonly string[] = []): strin
   );
 }
 
-/** The body with the ignore mechanics as the last paragraph of "When to ignore it", when the page has that section. */
 export function withIgnoreHelp(body: string, ruleId: string, scope: readonly string[]): string {
   const heading = /^## When to ignore it[ \t]*$/m.exec(body);
   if (!heading) return body;
@@ -136,10 +129,8 @@ export function withIgnoreHelp(body: string, ruleId: string, scope: readonly str
   return `${body.slice(0, end).trimEnd()}\n\n${ignoreHelp(ruleId, scope)}\n${body.slice(end)}`;
 }
 
-/** Rule id to page slug; a code span that names a rule in this map links to its page. */
 export type RuleLinks = ReadonlyMap<string, string>;
 
-/** The link table for a set of pages, read from their frontmatter before any page is rendered. */
 export function ruleLinks(pages: { slug: string; markdown: string }[]): RuleLinks {
   return new Map(
     pages.map(({ slug, markdown }) => [
@@ -154,7 +145,7 @@ export function attribution(sources: string[]): string {
     .filter((url) => SOURCE_NAMES[url] !== undefined)
     .map((url) => external(url, escapeHtml(SOURCE_NAMES[url]!)));
   if (links.length === 0) return "";
-  return `<p class="sources">Ported from ${links.join(" and ")}.</p>\n`;
+  return `<p class="sources">Βασισμένο σε ${links.join(" και ")}.</p>\n`;
 }
 
 export type Frontmatter = Record<string, string | string[]>;
@@ -253,7 +244,7 @@ export const headingId = (text: string): string =>
     .replace(/\s+/g, "-");
 
 const plainPre = (n: number): string =>
-  `<pre tabindex="0" role="region" aria-label="Code block ${n}">`;
+  `<pre tabindex="0" role="region" aria-label="Τμήμα κώδικα ${n}">`;
 const figurePre = (id: string): string =>
   `<pre tabindex="0" role="region" aria-labelledby="${id}">`;
 const captionId = (n: number): string => `code_${n}`;
@@ -294,7 +285,7 @@ function siteMarkdown(links: RuleLinks = new Map(), self = ""): Marked {
         const file = example[3];
         const caption =
           file !== undefined && file !== "tree.json"
-            ? `${EXAMPLE_CAPTION[kind]} in <code>${escapeHtml(file)}</code>`
+            ? `${EXAMPLE_CAPTION[kind]} στο <code>${escapeHtml(file)}</code>`
             : EXAMPLE_CAPTION[kind]!;
         return figure(`example ${kind}`, caption, language);
       },
@@ -331,7 +322,7 @@ function header(path: string): string {
         <a class="brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28" /> Data Tutor · Power BI Checker</a>
         <nav class="nav-row" aria-label="Site">${links}</nav>
         <details class="nav-menu">
-          <summary aria-label="Menu"><span class="nav-menu-icon" aria-hidden="true"></span></summary>
+          <summary aria-label="Μενού"><span class="nav-menu-icon" aria-hidden="true"></span></summary>
           <nav class="nav-panel" aria-label="Site">${links}</nav>
         </details>
       </div>
@@ -350,7 +341,7 @@ const FOOTER = `<footer class="site-footer">
         <p>
           Εκπαιδευτικό εργαλείο από την <strong>Data Tutor</strong> · Βασισμένο στον open-source
           κώδικα ${external("https://github.com/pbiplint/pbiplint", "pbiplint")} (άδεια AGPL-3.0 ·
-          ${external("[YOUR_GITHUB_REPO_URL]", "πηγαίος κώδικας")}).
+          ${external("https://github.com/alexvks22/pbiplint/", "πηγαίος κώδικας")}).
         </p>
         ${VERSION_MARKER}
       </div>
@@ -366,7 +357,7 @@ export interface PageOptions {
 
 export function page({ title, description, path, main, scripts = [] }: PageOptions): string {
   return `<!doctype html>
-<html lang="en">
+<html lang="el">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -420,19 +411,20 @@ export function rulePage(
     layer: pageLayer(data, source),
     summary: firstParagraph(section(body, "What it checks")),
   };
-  const layerItem = showsLayers(published) ? ` · ${escapeHtml(LAYER_LABEL[meta.layer])} layer` : "";
+  const layerItem = showsLayers(published) ? ` · επίπεδο: ${escapeHtml(LAYER_LABEL[meta.layer])}` : "";
   const video = str(data.video);
+  const categoryName = CATEGORY_LABEL[meta.category] ?? meta.category;
   const main = `<article class="rule">
-  <p class="eyebrow"><a href="/rules/">Rules</a> / ${escapeHtml(meta.category)}</p>
+  <p class="eyebrow"><a href="/rules/">Κανόνες</a> / ${escapeHtml(categoryName)}</p>
   <h1>${escapeHtml(title)}</h1>
-  <p class="meta"><span class="badge ${escapeHtml(meta.severity)}">${escapeHtml(meta.severity)}</span> <code>${escapeHtml(meta.id)}</code> · ${escapeHtml(STATUS_LABEL[meta.status] ?? meta.status)}${layerItem} · scope: ${escapeHtml(list(data.scope).join(", "))}</p>
-  ${video ? `<p class="video">${external(video, "Watch the video for this rule")}</p>` : ""}
+  <p class="meta"><span class="badge ${escapeHtml(meta.severity)}">${escapeHtml(meta.severity)}</span> <code>${escapeHtml(meta.id)}</code> · ${escapeHtml(STATUS_LABEL[meta.status] ?? meta.status)}${layerItem} · εμβέλεια: ${escapeHtml(list(data.scope).join(", "))}</p>
+  ${video ? `<p class="video">${external(video, "Δείτε το βίντεο για αυτόν τον κανόνα")}</p>` : ""}
   ${render(withIgnoreHelp(body.replace(/^# .+\n/m, ""), meta.id, list(data.scope)), links, meta.id)}
-  ${attribution(list(data.sources))}<p class="cta"><a class="button" href="/">${CHECK_LABEL[meta.layer]}</a> ${external(`https://github.com/pbiplint/pbiplint/edit/main/rules/${slug}.md`, "Improve this page")}</p>
+  ${attribution(list(data.sources))}<p class="cta"><a class="button" href="/">${CHECK_LABEL[meta.layer]}</a></p>
 </article>`;
   return {
     html: page({
-      title: `${title} · Data Tutor PBIP Linter`,
+      title: `${title} · Data Tutor Power BI Checker`,
       description: plainText(meta.summary),
       path: `/rules/${slug}/`,
       main,
@@ -457,14 +449,14 @@ export function rulesIndex(
   const clauses: [(m: RuleMeta) => boolean, string][] = [
     [
       is("ported", "model", "powerquery"),
-      "rules ported from Microsoft's Best Practice Analyzer ruleset and verified against Tabular Editor",
+      "κανόνες από το επίσημο Best Practice Analyzer της Microsoft",
     ],
-    [is("needsLiveModel"), "listed but not run because they need statistics only a live model has"],
+    [is("needsLiveModel"), "καταγεγραμμένοι κανόνες που απαιτούν live μοντέλο"],
     [
       is("ported", "report"),
-      "report rules ported from PBI Inspector's base rules by Nat Van Gulck",
+      "κανόνες αναφορών από το PBI Inspector του Nat Van Gulck",
     ],
-    [is("builtin"), "built into the linter"],
+    [is("builtin"), "ενσωματωμένοι κανόνες ελέγχου"],
   ];
   for (const m of metas)
     if (!clauses.some(([counts]) => counts(m)))
@@ -480,8 +472,8 @@ export function rulesIndex(
   const parts = counted.filter(([n]) => n > 0).map(([n, text]) => `${n} ${text}`);
   const sources =
     parts.length > 2
-      ? `${parts.slice(0, -1).join(", ")}, and ${parts.at(-1)}`
-      : parts.join(" and ");
+      ? `${parts.slice(0, -1).join(", ")} και ${parts.at(-1)}`
+      : parts.join(" και ");
   const layerBadge = (m: RuleMeta): string =>
     showsLayers(published)
       ? ` <span class="layer ${escapeHtml(m.layer)}">${escapeHtml(LAYER_LABEL[m.layer])}</span>`
@@ -494,29 +486,30 @@ export function rulesIndex(
     const items = rows
       .map(
         (m) =>
-          `  <li data-layer="${escapeHtml(m.layer)}"><a href="/rules/${escapeHtml(m.slug)}/">${escapeHtml(m.title)}</a> <span class="badge ${escapeHtml(m.severity)}">${escapeHtml(m.severity)}</span>${layerBadge(m)}${m.status === "needsLiveModel" ? ' <span class="badge muted">needs a live model</span>' : ""}<br /><span class="summary">${renderInline(m.summary)}</span></li>`,
+          `  <li data-layer="${escapeHtml(m.layer)}"><a href="/rules/${escapeHtml(m.slug)}/">${escapeHtml(m.title)}</a> <span class="badge ${escapeHtml(m.severity)}">${escapeHtml(m.severity)}</span>${layerBadge(m)}${m.status === "needsLiveModel" ? ' <span class="badge muted">απαιτεί live μοντέλο</span>' : ""}<br /><span class="summary">${renderInline(m.summary)}</span></li>`,
       )
       .join("\n");
-    return `<h2 id="${headingId(category)}">${escapeHtml(category)}</h2>\n<ul class="rule-list">\n${items}\n</ul>`;
+    const categoryTitle = CATEGORY_LABEL[category] ?? category;
+    return `<h2 id="${headingId(category)}">${escapeHtml(categoryTitle)}</h2>\n<ul class="rule-list">\n${items}\n</ul>`;
   }).join("\n");
   const families = FILTER_LAYERS.filter((l) => metas.some((m) => m.layer === l));
   const filter =
     families.length >= 2
       ? `<fieldset class="filters" id="rules-filter" hidden>
-<legend>Show</legend>
+<legend>Εμφάνιση</legend>
 ${families.map((l) => `<label class="filter"><input type="checkbox" value="${l}" checked />${escapeHtml(boxLabel(l))}</label>`).join("\n")}
 <p class="rules-shown" role="status" aria-live="polite"></p>
 </fieldset>
 `
       : "";
   const main = `<article class="prose">
-<h1>Rules</h1>
-<p>${metas.length} rules: ${sources}. Ranked by severity, then category, then how many objects they hit.</p>
+<h1>Κανόνες Ελέγχου</h1>
+<p>Συνολικά ${metas.length} κανόνες: ${sources}. Κατατάσσονται ανάλογα με τη σοβαρότητα και την κατηγορία τους.</p>
 ${filter}${sections}
 </article>`;
   return page({
-    title: "Rules · Data Tutor PBIP Linter",
-    description: "Every rule checked: what it checks, why it matters, and how to fix it.",
+    title: "Κανόνες · Data Tutor Power BI Checker",
+    description: "Όλοι οι κανόνες βέλτιστων πρακτικών Power BI που ελέγχει το εργαλείο.",
     path: "/rules/",
     main,
     scripts: filter ? ["/src/rules-filter.ts"] : [],
@@ -527,7 +520,7 @@ export function contentPage(markdown: string, path: string, source: string): str
   const { data, body } = parseFrontmatter(markdown, source);
   const title = str(data.title);
   return page({
-    title: title.includes("Data Tutor") ? title : `${title} · Data Tutor PBIP Linter`,
+    title: title.includes("Data Tutor") ? title : `${title} · Data Tutor Power BI Checker`,
     description: str(data.description),
     path,
     main: `<article class="prose">\n${render(body)}\n</article>`,
@@ -550,11 +543,9 @@ export function latestPage(version: string): string {
 }
 
 export function llmsTxt(): string {
-  return `# Data Tutor · PBIP Linter
+  return `# Data Tutor · Power BI Checker
 
 > Powered by pbiplint, this tool lints Power BI projects (PBIP), the semantic model in TMDL and the report in PBIR, for best-practice problems. It runs in the browser and sends nothing anywhere.
-
-For a coding assistant that can run commands: run \`npx pbiplint skill\` and follow it.
 
 ## Docs
 
