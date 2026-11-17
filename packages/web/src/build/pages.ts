@@ -4,13 +4,10 @@ import { FILTER_LAYERS, LAYER_LABEL, RULE_LAYERS, boxLabel, type RuleLayer } fro
 export const SITE = "https://pbiplint.com";
 
 export const NAV = [
-  { href: "/", label: "Lint" },
-  { href: "/rules/", label: "Rules" },
-  { href: "/cli/", label: "CLI" },
-  { href: "/pipelines/", label: "Pipelines" },
-  { href: "/privacy/", label: "Privacy" },
-  { href: "/about/", label: "About" },
-  { href: "[YOUR_GITHUB_REPO_URL]", label: "GitHub" },
+  { href: "/", label: "Έλεγχος" },
+  { href: "/rules/", label: "Κανόνες" },
+  { href: "/privacy/", label: "Ασφάλεια" },
+  { href: "/about/", label: "Σχετικά" },
 ] as const;
 
 /**
@@ -331,7 +328,7 @@ function header(path: string): string {
   ).join("");
   return `<header class="site-header">
       <div class="container">
-        <a class="brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28" /> Data Tutor · PBIP Linter</a>
+        <a class="brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28" /> Data Tutor · Power BI Checker</a>
         <nav class="nav-row" aria-label="Site">${links}</nav>
         <details class="nav-menu">
           <summary aria-label="Menu"><span class="nav-menu-icon" aria-hidden="true"></span></summary>
@@ -348,12 +345,12 @@ export const THEME_HELP_PATH = `/about/#${THEME_HELP_ID}`;
 
 const FOOTER = `<footer class="site-footer">
       <div class="container">
-        <p>Nothing you lint leaves your browser: <a href="/privacy/">the Privacy Promise</a>.</p>
-        <p>Light or dark follows your device's setting: <a href="${THEME_HELP_PATH}">how to change it</a>.</p>
+        <p>100% Ιδιωτικό — κανένα αρχείο δεν φεύγει από τον browser σας: <a href="/privacy/">Πολιτική Ασφαλείας</a>.</p>
+        <p>Φωτεινό ή σκοτεινό θέμα ανάλογα με τις ρυθμίσεις της συσκευής σας: <a href="${THEME_HELP_PATH}">πώς να το αλλάξετε</a>.</p>
         <p>
-          Hosted by <strong>Data Tutor</strong>. Powered by the open-source
-          ${external("https://github.com/pbiplint/pbiplint", "pbiplint")} engine under the
-          AGPL-3.0-or-later license (${external("[YOUR_GITHUB_REPO_URL]", "Source Code")}).
+          Εκπαιδευτικό εργαλείο από την <strong>Data Tutor</strong> · Βασισμένο στον open-source
+          κώδικα ${external("https://github.com/pbiplint/pbiplint", "pbiplint")} (άδεια AGPL-3.0 ·
+          ${external("[YOUR_GITHUB_REPO_URL]", "πηγαίος κώδικας")}).
         </p>
         ${VERSION_MARKER}
       </div>

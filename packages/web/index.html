@@ -1,17 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="el">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Data Tutor · PBIP Linter: best-practice linter for Power BI projects</title>
+    <title>Data Tutor · Έλεγχος Βέλτιστων Πρακτικών Power BI</title>
     <meta
       name="description"
-      content="Paste TMDL or drop a PBIP folder and get ranked best-practice findings for the semantic model and the report, with fix guidance. Runs in your browser. Nothing is uploaded."
+      content="Ελέγξτε αυτόματα το Power BI project σας για λάθη και βέλτιστες πρακτικές. Εκτελείται τοπικά στον browser σας, χωρίς να ανεβαίνουν δεδομένα πουθενά."
     />
-    <meta property="og:title" content="Data Tutor · PBIP Linter" />
+    <meta property="og:title" content="Data Tutor · Έλεγχος Power BI" />
     <meta
       property="og:description"
-      content="Best-practice linter for Power BI projects. Runs in your browser. Nothing is uploaded."
+      content="Ελέγξτε αυτόματα το Power BI project σας για βέλτιστες πρακτικές. 100% ιδιωτικό, τρέχει στον browser σας."
     />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/src/styles.css" />
@@ -20,94 +20,77 @@
     <header class="site-header">
       <div class="container">
         <a class="brand" href="/"
-          ><img src="/favicon.svg" alt="" width="28" height="28" /> Data Tutor · PBIP Linter</a
+          ><img src="/favicon.svg" alt="" width="28" height="28" /> Data Tutor · Power BI Checker</a
         >
-        <!-- The row on a wide screen; below 680 pixels the stylesheet shows the Menu button instead.
-             The two lists are the same, and NAV in src/build/pages.ts is the one they follow. -->
         <nav class="nav-row" aria-label="Site">
-          <a href="/" aria-current="page">Lint</a><a href="/rules/">Rules</a><a href="/cli/">CLI</a
-          ><a href="/pipelines/">Pipelines</a><a href="/privacy/">Privacy</a
-          ><a href="/about/">About</a
-          ><a href="[YOUR_GITHUB_REPO_URL]" target="_blank" rel="noopener noreferrer"
-            >GitHub<span class="visually-hidden"> (opens in a new tab)</span></a
-          >
+          <a href="/" aria-current="page">Έλεγχος</a><a href="/rules/">Κανόνες</a
+          ><a href="/privacy/">Ασφάλεια</a><a href="/about/">Σχετικά</a>
         </nav>
         <details class="nav-menu">
           <summary aria-label="Menu">
             <span class="nav-menu-icon" aria-hidden="true"></span>
           </summary>
           <nav class="nav-panel" aria-label="Site">
-            <a href="/" aria-current="page">Lint</a><a href="/rules/">Rules</a
-            ><a href="/cli/">CLI</a><a href="/pipelines/">Pipelines</a
-            ><a href="/privacy/">Privacy</a><a href="/about/">About</a
-            ><a
-              href="[YOUR_GITHUB_REPO_URL]"
-              target="_blank"
-              rel="noopener noreferrer"
-              >GitHub<span class="visually-hidden"> (opens in a new tab)</span></a
-            >
+            <a href="/" aria-current="page">Έλεγχος</a><a href="/rules/">Κανόνες</a
+            ><a href="/privacy/">Ασφάλεια</a><a href="/about/">Σχετικά</a>
           </nav>
         </details>
       </div>
     </header>
     <main class="container">
       <section>
-        <h1>Lint your Power BI project in the browser</h1>
+        <h1>Ελέγξτε το Power BI Project σας σε δευτερόλεπτα</h1>
         <p class="lede">
-          Paste TMDL, or drop a PBIP folder, a <code>.SemanticModel</code> folder, or a
-          <code>.Report</code> folder. The linter checks the semantic model against the Microsoft
-          best-practice rules and the report against PBI Inspector's rules and its own, ranks what
-          it finds, and tells you how to fix each one. Nothing is uploaded: the analysis runs in
-          this tab.
+          Σύρετε τον φάκελο του Power BI έργου σας (<code>.pbip</code>) ή επικολλήστε τον κώδικα
+          του μοντέλου σας. Το εργαλείο ελέγχει αυτόματα τους πίνακες, τις σχέσεις, τα DAX και τα
+          γραφήματά σας με βάση τις επίσημες βέλτιστες πρακτικές και σας δείχνει βήμα-βήμα τι να
+          βελτιώσετε. <strong>Τίποτα δεν ανεβαίνει στο internet:</strong> όλος ο έλεγχος γίνεται
+          με ασφάλεια στον υπολογιστή σας.
         </p>
       </section>
       <div class="inputs">
         <section class="panel">
-          <h2><label for="paste">Paste TMDL</label></h2>
+          <h2>1. Επιλογή Φακέλου (Προτείνεται)</h2>
+          <div id="drop" class="drop">
+            <p>
+              Σύρετε εδώ τον φάκελο του Power BI Project σας (ή μόνο τον φάκελο
+              <code>.SemanticModel</code> ή <code>.Report</code>).
+            </p>
+            <button id="choose-folder" type="button" class="secondary">Επιλογή φακέλου</button>
+            <p id="picker-note" class="hint picker-note" hidden>
+              Ο browser θα σας ζητήσει άδεια για να διαβάσει τα αρχεία του φακέλου. Τα αρχεία
+              διαβάζονται μόνο τοπικά στην οθόνη σας — τίποτα δεν αποθηκεύεται και τίποτα δεν
+              στέλνεται εκτός του υπολογιστή σας.
+            </p>
+            <input id="folder-input" type="file" webkitdirectory multiple hidden />
+          </div>
+          <p class="hint">
+            Διαβάζονται μόνο τα αρχεία δομής της αναφοράς και του μοντέλου. Τα δεδομένα σας
+            παραμένουν απολύτως ασφαλή.
+          </p>
+        </section>
+        <section class="panel">
+          <h2><label for="paste">2. Ή Επικόλληση Κώδικα (TMDL)</label></h2>
           <textarea
             id="paste"
             aria-describedby="paste-hint"
             spellcheck="false"
             placeholder="table Sales&#10;&#9;column 'Sale ID'&#10;&#9;&#9;dataType: int64&#10;&#9;&#9;sourceColumn: SaleID"
           ></textarea>
-          <div><button id="lint-paste" type="button">Lint pasted TMDL</button></div>
+          <div><button id="lint-paste" type="button">Έλεγχος κώδικα</button></div>
           <p id="paste-hint" class="hint">
-            Paste any complete TMDL: a table's file, several tables, or a script copied from TMDL
-            view in Power BI Desktop with Script TMDL. TMDL with no <code>model</code> line is part
-            of a model, so the rules that need the whole model are skipped.
-          </p>
-        </section>
-        <section class="panel">
-          <h2>Drop a folder</h2>
-          <div id="drop" class="drop">
-            <p>
-              Drop a PBIP folder, a <code>.SemanticModel</code> or <code>.Report</code> folder, or a
-              single <code>.tmdl</code> file here.
-            </p>
-            <button id="choose-folder" type="button" class="secondary">Choose a folder</button>
-            <p id="picker-note" class="hint picker-note" hidden>
-              Chrome and Edge ask first whether this page may view the folder; that wording is the
-              browser's own. This tool only reads the files, in this tab: nothing is uploaded and
-              nothing is saved. Dragging the folder onto the page skips the question.
-            </p>
-            <input id="folder-input" type="file" webkitdirectory multiple hidden />
-          </div>
-          <p class="hint">
-            Only .tmdl files, the report's JSON under its definition folder, .platform,
-            definition.pbir, the .pbip file, and pbiplint.config.json are read. Nothing else in the
-            folder is opened. Chrome's folder picker skips files whose names begin or end with a
-            space; dragging the folder in reads every file.
+            Αντιγράψτε τον ορισμό ενός πίνακα από το TMDL View του Power BI Desktop και κάντε τον
+            επικόλληση εδώ για γρήγορο έλεγχο.
           </p>
         </section>
       </div>
       <div class="actions">
-        <button id="try-sample" type="button" class="secondary">Try the sample project</button>
+        <button id="try-sample" type="button" class="secondary">
+          Δοκιμή με έτοιμο παράδειγμα
+        </button>
         <p class="hint">
-          A small sales project, a model and its report, with planted violations, the same one
-          <a href="/cli/"
-            ><code>npx pbiplint <span class="flag">--sample</span></code></a
-          >
-          lints.
+          Δεν έχετε πρόχειρο κάποιο αρχείο; Πατήστε το κουμπί για να δείτε πώς λειτουργεί ο έλεγχος
+          σε ένα έτοιμο δείγμα αναφοράς πωλήσεων.
         </p>
       </div>
       <p id="status" class="status" role="status" aria-live="polite" hidden></p>
@@ -117,26 +100,25 @@
     <footer class="site-footer">
       <div class="container">
         <p>
-          Nothing you lint leaves your browser:
-          <a href="/privacy/">the Privacy Promise</a>.
+          100% Ιδιωτικό — κανένα αρχείο δεν φεύγει από τον browser σας:
+          <a href="/privacy/">Πολιτική Ασφαλείας</a>.
         </p>
         <p>
-          Light or dark follows your device's setting:
-          <a href="/about/#light-and-dark">how to change it</a>.
+          Φωτεινό ή σκοτεινό θέμα ανάλογα με τις ρυθμίσεις της συσκευής σας:
+          <a href="/about/#light-and-dark">πώς να το αλλάξετε</a>.
         </p>
         <p>
-          Hosted by <strong>Data Tutor</strong>. Powered by the open-source
+          Εκπαιδευτικό εργαλείο από την <strong>Data Tutor</strong> · Βασισμένο στον open-source
+          κώδικα
           <a
             href="https://github.com/pbiplint/pbiplint"
             target="_blank"
             rel="noopener noreferrer"
             >pbiplint<span class="visually-hidden"> (opens in a new tab)</span></a
           >
-          engine under the AGPL-3.0-or-later license (<a
-            href="[YOUR_GITHUB_REPO_URL]"
-            target="_blank"
-            rel="noopener noreferrer"
-            >Source Code<span class="visually-hidden"> (opens in a new tab)</span></a
+          (άδεια AGPL-3.0 ·
+          <a href="[YOUR_GITHUB_REPO_URL]" target="_blank" rel="noopener noreferrer"
+            >πηγαίος κώδικας<span class="visually-hidden"> (opens in a new tab)</span></a
           >).
         </p>
         <!-- pbiplint-version -->
