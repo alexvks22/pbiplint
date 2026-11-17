@@ -10,7 +10,7 @@ export const NAV = [
   { href: "/pipelines/", label: "Pipelines" },
   { href: "/privacy/", label: "Privacy" },
   { href: "/about/", label: "About" },
-  { href: "https://github.com/pbiplint/pbiplint", label: "GitHub" },
+  { href: "[YOUR_GITHUB_REPO_URL]", label: "GitHub" },
 ] as const;
 
 /**
@@ -84,37 +84,12 @@ const str = (v: string | string[] | undefined): string =>
   Array.isArray(v) ? (v[0] ?? "") : (v ?? "");
 const list = (v: string | string[] | undefined): string[] => (Array.isArray(v) ? v : v ? [v] : []);
 
-/**
- * A C0 control character other than tab, line feed, and carriage return, or U+007F. A rule page
- * can need one in an example, such as the U+0001 the invalid-character pages show, which a copy of
- * the example has to keep to fire the rule. Written raw, it is an invisible byte in the page, so
- * the renderer writes each as a character reference (characterReferences below), and
- * check-site.ts fails the build on one that reaches a page raw. The reference is visible in the
- * page's source and in a diff.
- *
- * Neither form is valid HTML. The standard makes a raw control character a parse error, which
- * parse5 names control-character-in-input-stream, and a reference to one a parse error too,
- * control-character-reference, and a browser keeps the character either way. Two are exceptions.
- * U+000C is whitespace to HTML, so neither form is an error. U+0000 has errors of its own: raw it
- * is unexpected-null-character and a browser drops it, and as a reference it is
- * null-character-reference and a browser reads it as U+FFFD.
- */
 // eslint-disable-next-line no-control-regex -- matching control characters is the whole point
 export const CONTROL_CHARACTER = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 
-/**
- * Each CONTROL_CHARACTER as a decimal character reference, `&#1;` for U+0001, the form marked
- * uses for the apostrophe. A browser parses the reference to the same character, so the text it
- * shows, and the text a reader copies, is unchanged. U+0000 is the exception: a browser drops it
- * raw and reads `&#0;` as U+FFFD, and no page carries one.
- */
 const characterReferences = (s: string): string =>
   s.replace(CONTROL_CHARACTER, (c) => `&#${c.charCodeAt(0)};`);
 
-/**
- * escapeHtml plus the apostrophe, for text inside <code>, matching what marked writes there, with
- * each control character a reference.
- */
 const escapeCode = (s: string): string => characterReferences(escapeHtml(s).replace(/'/g, "&#39;"));
 
 /** Report objects whose page.json or visual.json carries an `annotations` array an ignore can go in. */
@@ -122,11 +97,6 @@ const REPORT_ANNOTATED = new Set(["Page", "Visual"]);
 /** The other report objects: a rule scoped to these alone is turned off for the project instead. */
 const REPORT_ONLY = new Set(["Report", "Bookmark", "ReportMeasure"]);
 
-/**
- * How to silence a rule, appended to a page's "When to ignore it" section. Core exports the same
- * text as ignoreHelp; this copy is deliberate for the reason CATEGORY_ORDER gives, and a test
- * holds the two equal.
- */
 export function ignoreHelp(ruleId: string, scope: readonly string[] = []): string {
   const project = `To turn the rule off for a whole project, set \`"${ruleId}": "off"\` under \`rules\` in \`pbiplint.config.json\`.`;
   if (scope.length > 0 && scope.every((s) => s === "File"))
@@ -161,13 +131,10 @@ export function ignoreHelp(ruleId: string, scope: readonly string[] = []): strin
 
 /** The body with the ignore mechanics as the last paragraph of "When to ignore it", when the page has that section. */
 export function withIgnoreHelp(body: string, ruleId: string, scope: readonly string[]): string {
-  // Both searches are line-anchored, so "## When to ignore it" in the middle of a prose line is
-  // never taken for the heading and a mid-line "## " never for the section that ends it.
   const heading = /^## When to ignore it[ \t]*$/m.exec(body);
   if (!heading) return body;
   const after = heading.index + heading[0].length;
   const next = /^## /m.exec(body.slice(after));
-  // A match is the next heading itself, and the section ends at the newline in front of it.
   const end = next ? after + next.index - 1 : body.length;
   return `${body.slice(0, end).trimEnd()}\n\n${ignoreHelp(ruleId, scope)}\n${body.slice(end)}`;
 }
@@ -185,11 +152,6 @@ export function ruleLinks(pages: { slug: string; markdown: string }[]): RuleLink
   );
 }
 
-/**
- * The attribution line under a rule page, naming only the sources SOURCE_NAMES knows. A page not
- * yet on the template still carries a further-reading URL in `sources`, and that URL is under its
- * Links too, so crediting it as a port source would be false. Nothing when no source is named.
- */
 export function attribution(sources: string[]): string {
   const links = sources
     .filter((url) => SOURCE_NAMES[url] !== undefined)
@@ -200,19 +162,11 @@ export function attribution(sources: string[]): string {
 
 export type Frontmatter = Record<string, string | string[]>;
 
-/** A double-quoted scalar, with the escapes a quoted value is allowed to carry resolved. */
 const unquote = (value: string): string => {
   const quoted = /^"(.*)"$/.exec(value);
   return quoted ? quoted[1]!.replace(/\\(["\\])/g, "$1") : value;
 };
 
-/**
- * The frontmatter the rule pages use: `key: value`, `key: [a, b]`, and `key:` followed by
- * `  - item` lines. Blank lines are allowed between keys; anything else it cannot read is an
- * error rather than a skip, because a key dropped in silence renders a page with a field missing
- * and nothing to say why. `source` is the file a reader would open to fix that, such as
- * `rules/<slug>.md`, and it names the page in every error thrown here.
- */
 export function parseFrontmatter(
   text: string,
   source: string,
@@ -253,56 +207,15 @@ export function parseFrontmatter(
   return { data, body: m[2]! };
 }
 
-/** A file family a project can hold, and so a family the site can lint: core calls these `LayerName`. */
 export type SiteLayer = "model" | "report";
-
-/** The layer a rule page declares: see layers.ts, which the results page shares. */
 export type { RuleLayer };
 
-/**
- * The file families pbiplint.com publishes. A rule page whose layer is not published is not
- * rendered, not in the rules index, not in the sitemap, and not in the rule-id link map, so its
- * id stays plain code on the pages that mention it. A page with no `layer` key counts as `model`.
- *
- * `project` is not a member and never becomes one: it is not a file family, and a `project` page
- * publishes whenever this list names either family, because a project rule fires on any input the
- * site can lint. `PARSE_ISSUE` is the page that shows it, on the site today and on a model-only
- * run. Keeping `project` out also leaves "more than one layer published" a question about the two
- * families, which is what the layer column below turns on.
- *
- * The gate is here because the site deploys from main on every push while the ported report rules
- * landed on main several pull requests before the browser could lint a report: without it,
- * pbiplint.com would have carried pages for rules no published tool ran, for weeks. Pull request 7,
- * where the browser reads a report, set this to both families, which turned on the index's layer
- * badge and the rule page's layer item (showsLayers below) and moved the value pinned in
- * generate.test.ts and the site's pinned counts with it.
- *
- * With one family published, a badge on every row would read the same word on all of them, a
- * column that distinguishes nothing, which is why both wait on showsLayers rather than rendering
- * always. The gate's functions take the list as an argument defaulting to this one, so a test can
- * still render the one-family site.
- */
 export const SITE_LAYERS: readonly SiteLayer[] = ["model", "report"];
 
-/**
- * Whether the site names a rule's layer: the badge on each row of the rules index and the item in
- * a rule page's meta line. Only when more than one family is published, since with one every
- * published page would carry the same word. The index and the page take the published list as an
- * argument defaulting to SITE_LAYERS, so a test can render the two-family site before it exists.
- */
 export const showsLayers = (published: readonly SiteLayer[] = SITE_LAYERS): boolean =>
   new Set(published).size > 1;
 
-/**
- * The layer a page's frontmatter declares, which decides whether the site publishes the page
- * (decision 15). A page with no `layer` key at all counts as `model`. A key that is present but
- * empty, or names no layer, is an error rather than a fall back to `model`: the site publishes the
- * model layer, so reading a blank or mistyped key as `model` is how a report page would reach the
- * site by accident. `source` names the page in the error, as parseFrontmatter's errors do.
- */
 export function pageLayer(data: Frontmatter, source: string): RuleLayer {
-  // An absent key and a present but empty one are different things in the parsed frontmatter, and
-  // only str() reads them alike, so the key is tested before its value is.
   if (data.layer === undefined) return "model";
   const value = str(data.layer);
   const layer = RULE_LAYERS.find((l) => l === value);
@@ -314,12 +227,6 @@ export function pageLayer(data: Frontmatter, source: string): RuleLayer {
   return layer;
 }
 
-/**
- * Whether the site publishes a page on a layer, and so whether it is generated at all. A `project`
- * page publishes as soon as either family does, because a project rule can fire on any input the
- * site can lint. A `powerquery` page publishes whenever the model does, since its rule reads the M
- * in model files. `published` is SITE_LAYERS unless a test renders another site.
- */
 export const publishesLayer = (
   layer: RuleLayer,
   published: readonly SiteLayer[] = SITE_LAYERS,
@@ -338,14 +245,9 @@ const firstParagraph = (s: string): string =>
     .split(/\n\s*\n/)[0]
     ?.replace(/\s+/g, " ")
     .trim() ?? "";
-/** A Markdown paragraph as prose: code marks dropped, whitespace collapsed. For a meta description. */
 const plainText = (markdown: string): string =>
   markdown.replace(/`+/g, "").replace(/\s+/g, " ").trim();
 
-/**
- * The id a heading gets, so a section can be linked to: the text in lower case with code marks
- * and punctuation dropped and each run of spaces a hyphen. "How to fix it" is "how-to-fix-it".
- */
 export const headingId = (text: string): string =>
   plainText(text)
     .toLowerCase()
@@ -353,58 +255,13 @@ export const headingId = (text: string): string =>
     .trim()
     .replace(/\s+/g, "-");
 
-/**
- * How a page's nth plain code block opens: as a tab stop, so a block whose long line scrolls
- * sideways can be scrolled from the keyboard, and as a named region, so a screen reader that lands
- * on the tab stop says what it has reached. A plain fence has no caption to take a name from, so
- * it is "Code block 1", "Code block 2", and so on in document order, counted apart from the
- * figures. The number keeps two of them on one page apart: axe's landmark-unique check fails two
- * regions with one name, and a screen reader's list of regions could not tell them apart either.
- * A figure's block is named by its caption (figurePre below).
- */
 const plainPre = (n: number): string =>
   `<pre tabindex="0" role="region" aria-label="Code block ${n}">`;
-/**
- * How a figure's code block opens: plainPre's tab stop and region, named by the figure's caption,
- * so a screen reader announces "Fires the rule in visual.json, region" when the block takes focus.
- */
 const figurePre = (id: string): string =>
   `<pre tabindex="0" role="region" aria-labelledby="${id}">`;
-/**
- * The id of a page's nth figure caption, counted from 1 in document order. The underscore is one
- * character headingId never writes, so no heading on the page can take a caption's id.
- */
 const captionId = (n: number): string => `code_${n}`;
-/**
- * marked's own fence renderer, for a fence that is not a figure, whose output gains plainPre and
- * has its control characters written as references, which marked's escaping leaves raw.
- */
 const plainFence = new Renderer();
 
-/**
- * The site's Markdown renderer. marked adds no heading ids of its own since v8, so headings get
- * them here. On a rule page, a fence whose info string is `tmdl fires` or `tmdl fixed` renders as
- * a captioned figure, and so does `pbir fires <file>` or `pbir fixed <file>`, as JSON with the
- * file it stands for in the caption (a `tree.json` document names its files by its keys, so its
- * caption stays bare). A `json pbiplint.config.json` fence renders as a JSON figure captioned
- * `pbiplint.config.json`, without the fires or fixed class, since it is the config an example
- * runs under rather than an example. Any other fence renders as marked writes it.
- *
- * Every code block is a tab stop, since a long line scrolls inside it and a keyboard could not
- * otherwise reach what is out of view (WCAG 2.1.1), and a named region, so the stop is announced
- * as something: a figure's block is labelled by its caption, whose id (captionId) counts the
- * page's figures in document order, and any other block is "Code block" with its own count,
- * "Code block 1", "Code block 2" (plainPre). Both counts start again with each document parsed,
- * so every page starts at `code_1` and "Code block 1" whichever renderer parses it.
- *
- * Every code block and code span writes a control character as a character reference
- * (CONTROL_CHARACTER). A code span naming another rule links to its page; the renderer writes
- * every other code span too, rather than handing it back to marked, whose escaping would leave a
- * control character raw.
- *
- * A link to another site, written as a link or as a bare URL, is written by `external`, so it
- * opens in a new tab and says so; a path or an anchor on this site goes back to marked as it is.
- */
 function siteMarkdown(links: RuleLinks = new Map(), self = ""): Marked {
   let figures = 0;
   let plainBlocks = 0;
@@ -438,7 +295,6 @@ function siteMarkdown(links: RuleLinks = new Map(), self = ""): Marked {
         const language = example[1] === "pbir" ? "json" : "tmdl";
         const kind = example[2]!;
         const file = example[3];
-        // The file name is code, so it keeps its case under the caption's capitals.
         const caption =
           file !== undefined && file !== "tree.json"
             ? `${EXAMPLE_CAPTION[kind]} in <code>${escapeHtml(file)}</code>`
@@ -446,8 +302,6 @@ function siteMarkdown(links: RuleLinks = new Map(), self = ""): Marked {
         return figure(`example ${kind}`, caption, language);
       },
       codespan({ text }: Tokens.Codespan): string {
-        // A browser may break a line between the two hyphens of --output, so each flag is kept
-        // whole (see code .flag in styles.css); the spaces between words still break.
         const flags = escapeCode(text).replace(/(^|\s)(-\S+)/g, '$1<span class="flag">$2</span>');
         const code = `<code>${flags}</code>`;
         const slug = links.get(text);
@@ -456,7 +310,6 @@ function siteMarkdown(links: RuleLinks = new Map(), self = ""): Marked {
       },
       link({ href, text, tokens, autolink }: Tokens.Link): string | false {
         if (!leavesSite(href)) return false;
-        // A bare URL is its own label, as marked writes one.
         return external(href, autolink ? escapeHtml(text) : this.parser.parseInline(tokens));
       },
     },
@@ -465,10 +318,6 @@ function siteMarkdown(links: RuleLinks = new Map(), self = ""): Marked {
 const md = siteMarkdown();
 const render = (markdown: string, links?: RuleLinks, self?: string): string =>
   (links ? siteMarkdown(links, self) : md).parse(markdown, { async: false }) as string;
-/**
- * A Markdown paragraph as inline HTML, so `FILTER('Table')` in a summary reads as code. A backtick
- * run marked leaves literal, such as the unterminated fence the parse-issue page names, is dropped.
- */
 const renderInline = (markdown: string): string =>
   plainText(md.parseInline(markdown, { async: false }) as string);
 
@@ -480,11 +329,9 @@ function header(path: string): string {
       ? external(n.href, n.label)
       : `<a href="${n.href}"${current(n.href) ? ' aria-current="page"' : ""}>${n.label}</a>`,
   ).join("");
-  // The row on a wide screen; below 680 pixels the stylesheet shows the Menu button instead, a
-  // details element, so it opens and closes with no script. Only one of the two is ever shown.
   return `<header class="site-header">
       <div class="container">
-        <a class="brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28" /> pbiplint</a>
+        <a class="brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28" /> Data Tutor · PBIP Linter</a>
         <nav class="nav-row" aria-label="Site">${links}</nav>
         <details class="nav-menu">
           <summary aria-label="Menu"><span class="nav-menu-icon" aria-hidden="true"></span></summary>
@@ -494,24 +341,19 @@ function header(path: string): string {
     </header>`;
 }
 
-/**
- * Where the footer's version line goes. versionPlugin (build-info.ts) writes it into every page at
- * build and in the dev server, from one place for the generated pages and the hand-written ones.
- */
 export const VERSION_MARKER = "<!-- pbiplint-version -->";
 
-/** The About page's section on light and dark (#266), which every page's footer links to. */
 export const THEME_HELP_ID = "light-and-dark";
 export const THEME_HELP_PATH = `/about/#${THEME_HELP_ID}`;
 
 const FOOTER = `<footer class="site-footer">
       <div class="container">
-        <p>Nothing you lint leaves your browser: <a href="/privacy/">the pbiplint Privacy Promise</a>.</p>
+        <p>Nothing you lint leaves your browser: <a href="/privacy/">the Privacy Promise</a>.</p>
         <p>Light or dark follows your device's setting: <a href="${THEME_HELP_PATH}">how to change it</a>.</p>
         <p>
-          Free software under the AGPL-3.0-or-later license, from the makers of
-          ${external("https://www.youtube.com/@TheDataPractitioner", "The Data Practitioner")}. pbiplint
-          and its logo are trademarks of McKinley Consulting.
+          Hosted by <strong>Data Tutor</strong>. Powered by the open-source
+          ${external("https://github.com/pbiplint/pbiplint", "pbiplint")} engine under the
+          AGPL-3.0-or-later license (${external("[YOUR_GITHUB_REPO_URL]", "Source Code")}).
         </p>
         ${VERSION_MARKER}
       </div>
@@ -520,15 +362,11 @@ const FOOTER = `<footer class="site-footer">
 export interface PageOptions {
   title: string;
   description: string;
-  /** Site path with a trailing slash, e.g. `/rules/hide-foreign-keys/`. */
   path: string;
-  /** HTML for the inside of <main>. */
   main: string;
-  /** Module scripts this page loads after the shared nav script, as site paths. */
   scripts?: string[];
 }
 
-/** The shell every generated page shares. The home page (index.html) carries the same header and footer by hand. */
 export function page({ title, description, path, main, scripts = [] }: PageOptions): string {
   return `<!doctype html>
 <html lang="en">
@@ -566,10 +404,6 @@ export interface RuleMeta {
   summary: string;
 }
 
-/**
- * A rule page and the metadata the index lists it by. `published` is the list showsLayers reads,
- * SITE_LAYERS unless a test renders the two-family site.
- */
 export function rulePage(
   markdown: string,
   slug: string,
@@ -601,7 +435,7 @@ export function rulePage(
 </article>`;
   return {
     html: page({
-      title: `${title} · pbiplint`,
+      title: `${title} · Data Tutor PBIP Linter`,
       description: plainText(meta.summary),
       path: `/rules/${slug}/`,
       main,
@@ -610,30 +444,21 @@ export function rulePage(
   };
 }
 
-/** The rules index. `published` is the list showsLayers reads, as rulePage's is. */
 export function rulesIndex(
   metas: RuleMeta[],
   published: readonly SiteLayer[] = SITE_LAYERS,
 ): string {
-  // CATEGORY_ORDER drives the sections, so a rule with any other category would be in the count
-  // at the top of the page and in no list below it. Fail the build rather than ship a rule page
-  // nothing links to.
   for (const m of metas)
     if (!CATEGORY_ORDER.includes(m.category))
       throw new Error(
         `${m.slug}: unknown category "${m.category}" (add it to CATEGORY_ORDER in packages/web/src/build/pages.ts)`,
       );
-  // Each clause of the count at the top names the pages of one status, and for a ported rule one
-  // source. A page no clause names would be in the total and in no clause after it, so the build
-  // fails on one, as it fails on an unknown category, rather than print a count whose clauses do
-  // not sum to the pages listed (tracked in #66).
   const is =
     (status: string, ...layers: RuleLayer[]) =>
     (m: RuleMeta): boolean =>
       m.status === status && (layers.length === 0 || layers.includes(m.layer));
   const clauses: [(m: RuleMeta) => boolean, string][] = [
     [
-      // MINIMIZE_POWER_QUERY_TRANSFORMATIONS is Microsoft's and on the Power Query layer.
       is("ported", "model", "powerquery"),
       "rules ported from Microsoft's Best Practice Analyzer ruleset and verified against Tabular Editor",
     ],
@@ -642,26 +467,20 @@ export function rulesIndex(
       is("ported", "report"),
       "report rules ported from PBI Inspector's base rules by Nat Van Gulck",
     ],
-    [is("builtin"), "built into pbiplint"],
+    [is("builtin"), "built into the linter"],
   ];
   for (const m of metas)
     if (!clauses.some(([counts]) => counts(m)))
       throw new Error(
         `${m.slug}: status "${m.status}" on the ${m.layer} layer is in no clause of the rules count (add a clause for it in rulesIndex in packages/web/src/build/pages.ts)`,
       );
-  // A clause whose count is zero is left out: a site that published no report page would
-  // otherwise advertise "0 report rules ported from PBI Inspector's base rules", a source the page
-  // below lists nothing from. Written as a rule rather than a fixed string, so it stays right as
-  // the counts move.
   const counted = clauses.map(([counts, text]) => [metas.filter(counts).length, text] as const);
-  // Two clauses that both counted one page would sum past the total just as surely.
   const sum = counted.reduce((n, [c]) => n + c, 0);
   if (sum !== metas.length)
     throw new Error(
       `rules index: the clauses of the rules count sum to ${sum}, not the ${metas.length} pages listed (see rulesIndex in packages/web/src/build/pages.ts)`,
     );
   const parts = counted.filter(([n]) => n > 0).map(([n, text]) => `${n} ${text}`);
-  // Two clauses read "A and B"; three or more take a serial comma, "A, B, and C".
   const sources =
     parts.length > 2
       ? `${parts.slice(0, -1).join(", ")}, and ${parts.at(-1)}`
@@ -673,8 +492,6 @@ export function rulesIndex(
   const sections = CATEGORY_ORDER.map((category) => {
     const rows = metas
       .filter((m) => m.category === category)
-      // An explicit locale: with none, the order comes from the build machine's default and the
-      // same rule set can generate a different index on a different machine.
       .sort((a, b) => a.title.localeCompare(b.title, "en"));
     if (rows.length === 0) return "";
     const items = rows
@@ -685,9 +502,6 @@ export function rulesIndex(
       .join("\n");
     return `<h2 id="${headingId(category)}">${escapeHtml(category)}</h2>\n<ul class="rule-list">\n${items}\n</ul>`;
   }).join("\n");
-  // The Show filter (v3 spec, section 10.2): one box per family the listed rules span, hidden
-  // until rules-filter.ts reveals it, so a reader without the script sees every rule and no
-  // control that does nothing. With one family there is nothing to filter, so there is none.
   const families = FILTER_LAYERS.filter((l) => metas.some((m) => m.layer === l));
   const filter =
     families.length >= 2
@@ -704,33 +518,25 @@ ${families.map((l) => `<label class="filter"><input type="checkbox" value="${l}"
 ${filter}${sections}
 </article>`;
   return page({
-    title: "Rules · pbiplint",
-    description: "Every rule pbiplint checks: what it checks, why it matters, and how to fix it.",
+    title: "Rules · Data Tutor PBIP Linter",
+    description: "Every rule checked: what it checks, why it matters, and how to fix it.",
     path: "/rules/",
     main,
     scripts: filter ? ["/src/rules-filter.ts"] : [],
   });
 }
 
-/** A Markdown page with `title` and `description` frontmatter, such as content/about.md. */
 export function contentPage(markdown: string, path: string, source: string): string {
   const { data, body } = parseFrontmatter(markdown, source);
   const title = str(data.title);
   return page({
-    // A title that already names pbiplint, as "About pbiplint" does, is not named twice.
-    title: title.includes("pbiplint") ? title : `${title} · pbiplint`,
+    title: title.includes("Data Tutor") ? title : `${title} · Data Tutor PBIP Linter`,
     description: str(data.description),
     path,
     main: `<article class="prose">\n${render(body)}\n</article>`,
   });
 }
 
-/**
- * The /latest/ page, on pbiplint.com only, where a self-hosted copy's footer link lands. Without a
- * script it names the latest version; src/latest.ts compares it with the version in the fragment.
- * It gives no date, for the reason the README gives none: pbiplint.com deploys at the release's
- * merge, a few minutes before the tag publishes it.
- */
 export function latestPage(version: string): string {
   const v = escapeHtml(version);
   return page({
@@ -746,28 +552,17 @@ export function latestPage(version: string): string {
   });
 }
 
-/**
- * The site's llms.txt (https://llmstxt.org/): what pbiplint is, and for an assistant in a terminal,
- * the skill the CLI prints at its own version, ahead of the pages.
- */
 export function llmsTxt(): string {
-  return `# pbiplint
+  return `# Data Tutor · PBIP Linter
 
-> pbiplint lints Power BI projects (PBIP), the semantic model in TMDL and the report in PBIR, for best-practice problems. It runs on your own machine, in the browser at ${SITE} or as a command line from npm, and the site and the command line send nothing anywhere.
+> Powered by pbiplint, this tool lints Power BI projects (PBIP), the semantic model in TMDL and the report in PBIR, for best-practice problems. It runs in the browser and sends nothing anywhere.
 
-For a coding assistant that can run commands: run \`npx pbiplint skill\` and follow it. It prints a skill, at the version installed, that says when to run pbiplint, how to keep its output short, how to read the results, and what to leave to the user. \`npx pbiplint explain <RULE_ID>\` prints a rule's guidance the same way, so the rule pages need not be fetched.
+For a coding assistant that can run commands: run \`npx pbiplint skill\` and follow it.
 
 ## Docs
 
-- [The pbiplint CLI](${SITE}/cli/): how to get it, run it, and check that it sends nothing
-- [What a script can rely on](${SITE}/cli/#contract): stdout, exit codes, and the JSON fields
 - [Rules](${SITE}/rules/): every rule, what it checks, and how to fix it
-- [The pbiplint Privacy Promise](${SITE}/privacy/): what the site, the CLI, and the pipeline steps read and send
-
-## Optional
-
-- [Pipelines](${SITE}/pipelines/): pbiplint in GitHub Actions and Azure Pipelines
-- [About](${SITE}/about/): what pbiplint is and who makes it
+- [Privacy](${SITE}/privacy/): what the site reads and sends
 `;
 }
 
